@@ -1,0 +1,149 @@
+1. SELECT COUNT(ProductID) AS ProductNum
+    FROM Production.Product;
+
+2. SELECT COUNT(ProductSubcategoryID)
+    FROM Production.Product
+    WHERE ProductSubcategoryID IS NOT NULL;
+
+3. SELECT ProductSubcategoryID, COUNT(ProductID) AS CountedProducts
+    FROM Production.Product
+    WHERE ProductSubcategoryID IS NOT NULL
+    GROUP BY ProductSubcategoryID;
+
+4. SELECT COUNT(ProductID) AS ProductsWithoutSubcategory
+    FROM Production.Product
+    WHERE ProductSubcategoryID IS NULL;
+
+5. SELECT SUM(Quantity) AS TotalProductQuantity
+    FROM Production.ProductInventory;
+
+6. SELECT ProductID, SUM(Quantity) AS TheSum
+    FROM Production.ProductInventory
+    WHERE LocationID = 40
+    GROUP BY ProductID
+    HAVING SUM(Quantity) < 100;
+
+7. SELECT Shelf, ProductID, SUM(Quantity) AS TheSum
+    FROM Production.ProductInventory
+    WHERE LocationID = 40
+    GROUP BY Shelf, ProductID
+    HAVING SUM(Quantity) < 100;
+
+8. SELECT ProductID,  AVG(Quantity)
+    FROM Production.ProductInventory
+    WHERE LocationID = 10
+    GROUP BY ProductID;
+
+9. SELECT  ProductID, Shelf, AVG(Quantity) AS TheAvg
+    FROM Production.ProductInventory
+    GROUP BY ProductID, Shelf;
+  
+10. SELECT ProductID, Shelf, AVG(Quantity) AS TheAvg
+    FROM Production.ProductInventory
+    WHERE Shelf != 'N/A'
+    GROUP BY ProductID, Shelf;
+
+11. SELECT Color, Class, COUNT(ProductID) AS TheCount, AVG(ListPrice) AS AvgPrice
+    FROM Production.Product WHERE Color IS NOT NULL AND Class IS NOT NULL GROUP BY Color, Class;
+
+12. SELECT cr.Name AS Country, sp.Name AS Province
+    FROM Person.CountryRegion cr
+    JOIN Person.StateProvince sp ON cr.CountryRegionCode = sp.CountryRegionCode;
+
+13. SELECT cr.Name AS Country, sp.Name AS Province
+    FROM Person.CountryRegion cr
+    JOIN Person.StateProvince sp ON cr.CountryRegionCode = sp.CountryRegionCode
+    WHERE cr.Name IN ('Germany', 'Canada');
+
+14. SELECT DISTINCT od.ProductID
+    FROM dbo.[Order Details] od
+    JOIN dbo.Orders o ON od.OrderID = o.OrderID
+    WHERE o.OrderDate >= DATEADD(YEAR, -27, GETDATE());
+
+15. SELECT TOP 5 o.ShipPostalCode AS ZipCode
+    FROM dbo.[Order Details] od
+    JOIN dbo.Orders o ON od.OrderID = o.OrderID
+    WHERE o.ShipPostalCode IS NOT NULL
+    GROUP BY o.ShipPostalCode
+    ORDER BY SUM(od.Quantity) DESC;
+
+16. SELECT TOP 5 o.ShipPostalCode AS ZipCode
+    FROM dbo.[Order Details] od
+    JOIN dbo.Orders o ON od.OrderID = o.OrderID
+    WHERE o.ShipPostalCode IS NOT NULL
+    AND o.OrderDate >= DATEADD(YEAR, -27, GETDATE())
+    GROUP BY o.ShipPostalCode
+    ORDER BY SUM(od.Quantity) DESC;
+
+17. SELECT City, COUNT(CustomerID) AS CustomerNum
+    FROM dbo.Customers
+    GROUP BY City;
+
+18. SELECT City, COUNT(CustomerID) AS CustomerNum
+    FROM dbo.Customers
+    GROUP BY City
+	  HAVING COUNT(CustomerID) > 2;
+
+19. SELECT c.CompanyName AS CustomerName, o.OrderDate
+    FROM dbo.Customers c
+    JOIN dbo.Orders o ON c.CustomerID = o.CustomerID
+    WHERE o.OrderDate > '1998-01-01';
+
+20. SELECT c.CompanyName AS CustomerName, MAX(o.OrderDate) AS [Most Recent Order Date]
+	  FROM dbo.Customers c
+	  JOIN dbo.Orders o ON c.CustomerID = o.CustomerID
+	  GROUP BY c.CompanyName;
+
+21. SELECT c.CompanyName AS CustomerName, COUNT(od.ProductID) AS ProductsBought
+	  FROM dbo.Customers c
+	  JOIN dbo.Orders o ON c.CustomerID = o.CustomerID
+	  JOIN dbo.[Order Details] od ON o.OrderID = od.OrderID
+	  GROUP BY c.CompanyName;
+
+22. SELECT c.CustomerID, COUNT(od.ProductID) AS ProductsBought
+	  FROM dbo.Customers c
+	  JOIN dbo.Orders o ON c.CustomerID = o.CustomerID
+	  JOIN dbo.[Order Details] od ON o.OrderID = od.OrderID
+	  GROUP BY c.CustomerID
+	  HAVING COUNT(od.ProductID) > 100;
+
+23. SELECT 
+		s.CompanyName AS SupplierName, 
+		sh.CompanyName AS ShippingCompanyName
+	  FROM dbo.Suppliers s
+	  CROSS JOIN dbo.Shippers sh;
+
+24. SELECT o.OrderDate, p.ProductName
+  	FROM dbo.Orders o
+  	JOIN dbo.[Order Details] od ON o.OrderID = od.OrderID
+  	JOIN dbo.Products p ON od.ProductID = p.ProductID
+  	ORDER BY o.OrderDate, p.ProductName;
+
+25. SELECT
+  	e1.EmployeeID AS Employee1,
+  	e2.EmployeeID AS Employee2,
+  	e1.Title AS [Job Title]
+  	FROM dbo.Employees e1
+  	JOIN dbo.Employees e2 ON e1.Title = e2.Title;;
+
+26. SELECT e.EmployeeID AS ManagerID, COUNT(m.EmployeeID) AS ReportingNum
+  	FROM dbo.Employees e
+  	JOIN dbo.Employees m ON e.EmployeeID = m.ReportsTo
+  	GROUP BY e.EmployeeID
+  	HAVING COUNT(m.EmployeeID) > 2;
+	
+27. SELECT 
+		c.City, 
+		c.CompanyName AS Name, 
+		c.ContactName, 
+		'Customer' AS Type
+  	FROM dbo.Customers c
+  	WHERE c.City IS NOT NULL
+  	UNION
+  	SELECT 
+		s.City, 
+		s.CompanyName AS Name, 
+		s.ContactName, 
+		'Supplier' AS Type
+  	FROM dbo.Suppliers s
+  	WHERE s.City IS NOT NULL;
